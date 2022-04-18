@@ -458,10 +458,9 @@ impl Build {
 
         #[cfg(unix)]
         let status = {
-            let mut cmd = Command::new("open");
-            cmd.arg("-a");
-            cmd.arg("Playdate Simulator");
+            let mut cmd = Command::new(format!("{}/bin/PlaydateSimulator", playdate_sdk_path()?.display()));
             cmd.arg(&pdx_path);
+            println!("{:#?}", cmd);
             cmd.status()?
         };
 
@@ -527,14 +526,16 @@ impl Build {
             bail!("cargo failed with error {:?}", status);
         }
 
-        let overall_target_dir = project_path.join("target");
+        let overall_target_dir: PathBuf = "/tmp/rust-builds/".into();
+        // let overall_target_dir = project_path.join("target");
         let game_title = to_title_case(&target_name);
         let source_path = self.make_source_dir(&overall_target_dir, &game_title)?;
         let dest_path = overall_target_dir.join(format!("{}.pdx", &game_title));
         if dest_path.exists() {
             fs::remove_dir_all(&dest_path).unwrap_or_else(|_err| ());
         }
-        let mut target_dir = project_path.join("target");
+        let mut target_dir: PathBuf = "/tmp/rust-builds/".into();
+        // let mut target_dir = project_path.join("target");
         let dir_name = if self.release { "release" } else { "debug" };
         if self.device {
             target_dir = target_dir.join("thumbv7em-none-eabihf").join(dir_name);
