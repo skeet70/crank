@@ -456,7 +456,16 @@ impl Build {
             cmd.status()?
         };
 
-        #[cfg(unix)]
+        #[cfg(target_os = "macos")]
+        let status = {
+            let mut cmd = Command::new("open");
+            cmd.arg("-a");
+            cmd.arg("Playdate Simulator");
+            cmd.arg(&pdx_path);
+            cmd.status()?
+        };
+
+        #[cfg(target_os = "linux")]
         let status = {
             let mut cmd = Command::new(format!("{}/bin/PlaydateSimulator", playdate_sdk_path()?.display()));
             cmd.arg(&pdx_path);
